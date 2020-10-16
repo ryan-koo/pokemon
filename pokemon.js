@@ -1,7 +1,4 @@
 const puppeteer = require('puppeteer');
-const Promise = require('bluebird');
-const $ = require('cheerio');
-const req = require('request');
 
 const TEST_CARDS = {
     Charizard : 'Charizard SV49/SV94',
@@ -23,7 +20,7 @@ let card_search = search()
 async function search() {
     const browser = await puppeteer.launch({
         defaultViewport : {width : 1000, height : 1000},
-        headless : false,
+        headless : true,
         slowMo : 50,
         devtools : true,
     });
@@ -42,10 +39,11 @@ async function search() {
     await page.waitForSelector('.font-weight-bold.font-large.font-md-largest.mt-1');
 
     let data = await page.evaluate(async(SELECTORS) => {
+        const card_name = /.*(?=-)/
         let amount = document.querySelector(SELECTORS.amount)
             .textContent
             .trim();
-        let pokemon_card = /.*(?=-)/.exec(document.querySelector(SELECTORS.pokemon_card)
+        let pokemon_card = card_name.exec(document.querySelector(SELECTORS.pokemon_card)
             .textContent)[0]
             .trim();
         
