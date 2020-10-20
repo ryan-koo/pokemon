@@ -19,11 +19,16 @@ const SELECTORS = {
         amount : '.d-flex.font-weight-bold.font-default.text-center.align-items-end',
         sale_amount : '#prodContainer > div.row.mt-2 > div.col-12.col-lg-4.col-xl-3.right > div.row.d-none.d-lg-block > div > div > div.card-header.d-flex.align-center.flex-around.p-2 > div.d-flex.font-weight-bold.font-default.text-center.align-items-end > div > span',
         pokemon_card : '.font-weight-bold.font-large.font-md-largest.mt-1',
+        card_set : '.font-small.font-md-default',
     },
     TCG : {
         search_bar : '.input',
         card_nums : '.search-result__rarity',
-        pagination : '.pagination__arrow'
+        pagination : '.pagination__arrow',
+        amount : '.seller-spotlight__price',
+        pokemon_card : '.product-details__name',
+        card_set : '.product-details__set',
+        comments_btn : '.btn.btn-block.btn-primary',
     }
 }
 
@@ -42,7 +47,7 @@ async function open_browser() {
     console.log(tt_data);
 
     let tcg_data = await tcg_player(page, tt_data);
-    // console.log(tcg_data)
+    console.log(tcg_data)
 }
 
 async function trollandtoad(page) {
@@ -61,8 +66,8 @@ async function trollandtoad(page) {
     await page.waitForSelector('.font-weight-bold.font-large.font-md-largest.mt-1');
 
     let data = await page.evaluate(async(SELECTORS) => {
-        const card_name = /^.*?(?=-)/;
-        const card_rarity = /(?<=\-)(.*?)(?=\-)/;
+        const card_name = /^.*?(?=-)/g;
+        const card_rarity = /(?<=\-)(.*?)(?=\-)/g;
         let amount = document.querySelector(SELECTORS.TT.amount)
             .textContent
             .trim();
@@ -72,6 +77,9 @@ async function trollandtoad(page) {
         let card_num = card_rarity.exec(document.querySelector(SELECTORS.TT.pokemon_card)
             .textContent)[0]
             .trim();
+        let card_set = document.querySelector(SELECTORS.TT.card_set)
+            .textContent
+            .trim()
         
         if(amount.length > 7) {
             amount = document.querySelector(SELECTORS.TT.sale_amount)
@@ -84,6 +92,7 @@ async function trollandtoad(page) {
             Amount : amount,
             Pokemon : pokemon_card,
             Card_Number : card_num,
+            Card_Set : card_set,
         };
 
         return data;
@@ -100,16 +109,40 @@ async function tcg_player(page, tt_data) {
     await page.waitForSelector(SELECTORS.TCG.pagination);
 
     let data = await page.evaluate(async (SELECTORS, tt_data) => {
-        const card_rarity = /[\da-zA-Z\/]/ // Ask alex about card rarity numbers [A-Z]{1,2}\d{1,2}
+        const card_rarity = /(?<=#).*/g // Ask alex about card rarity numbers [A-Z]{1,2}\d{1,2}
         let card_numbers = document.querySelectorAll(SELECTORS.TCG.card_nums);
-        let i = 0;
-        console.log(card_numbers);
-        while(card_rarity.exec(card_numbers[i].textContent) != tt_data.Card_Number) {
-            console.log(card_numbers)[i]
-            i++;
+        
+        for(let i = 0; i < card_numbers.length - 1; i++) {
+            card_num = card_rarity.exec(document.querySelectorAll(SELECTORS.TCG.card_nums)[i]
+                .textContent)
+            console.log(card_num)
+            if(card_num == tt_data.Card_Number) {
+                console.log(card_num);
+                card_numbers[i].click()
+            }
         }
 
-        card_numbers[i].click()
+        await page.waitForSelector(SELECTORS.TCG.comments_btn); // ADD DELAY TO WAIT FOR PAGE TO LOAD
+
+        let amount = document.querySelector(SELECTORS.TCG.amount)
+            .textContent
+            .trim();
+        let pokemon_card = document.querySelector(SELECTORS.TCG.pokemon_card)
+            .textContent
+            .trim();
+        let card_set = document.querySelector(SELECTORS.TCG.card_set)
+            .textContent
+            .trim();
+
+        return {
+            Source : 'TCG Player',
+            Amount : amount,
+            Pokemon : pokemon_card,
+            Card_Number : card_num,
+            Card_Set : card_set,
+        }
 
     }, SELECTORS, tt_data);
+
+    return data;
 }
