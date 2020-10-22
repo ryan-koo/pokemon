@@ -38,6 +38,7 @@ async function open_browser() {
     const browser = await puppeteer.launch({
         defaultViewport : {width : 1000, height : 1000},
         headless : false,
+        executablePath : 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
         slowMo : 50,
         devtools : true,
     });
@@ -108,12 +109,12 @@ async function tcg_player(page, tt_data) {
     await page.type(SELECTORS.TCG.search_bar, tt_data.Pokemon + '\u000d');
     await page.waitForSelector(SELECTORS.TCG.pagination);
 
-    let data = await page.evaluate(async (SELECTORS, tt_data) => {
+    await page.evaluate(async (SELECTORS, tt_data) => {
         const card_rarity = /(?<=#).*/g // Ask alex about card rarity numbers [A-Z]{1,2}\d{1,2}
         let card_numbers = document.querySelectorAll(SELECTORS.TCG.card_nums);
         
-        for(let i = 0; i < card_numbers.length - 1; i++) {
-            card_num = card_rarity.exec(document.querySelectorAll(SELECTORS.TCG.card_nums)[i]
+        for(let i = 0; i < 2; i++) {
+            card_num = card_rarity.exec(card_numbers[i]
                 .textContent)
             console.log(card_num)
             if(card_num == tt_data.Card_Number) {
@@ -121,9 +122,12 @@ async function tcg_player(page, tt_data) {
                 card_numbers[i].click()
             }
         }
-
-        await page.waitForSelector(SELECTORS.TCG.comments_btn); // ADD DELAY TO WAIT FOR PAGE TO LOAD
-
+    }, SELECTORS, tt_data);
+    
+    await page.waitForSelector(SELECTORS.TCG.comments_btn) // .catch(err); // ADD DELAY TO WAIT FOR PAGE TO LOAD
+    // throw Error
+    
+    let data = await page.evaluate((SELECTORS) => {
         let amount = document.querySelector(SELECTORS.TCG.amount)
             .textContent
             .trim();
@@ -142,7 +146,7 @@ async function tcg_player(page, tt_data) {
             Card_Set : card_set,
         }
 
-    }, SELECTORS, tt_data);
+    }, SELECTORS);
 
     return data;
-}
+}   
