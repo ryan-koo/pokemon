@@ -1,5 +1,4 @@
 const puppeteer = require('puppeteer');
-const Promise = require('bluebird');
 
 const TEST_CARDS = {
     Charizard : 'Charizard SV49/SV94',
@@ -39,7 +38,6 @@ async function open_browser() {
     const browser = await puppeteer.launch({
         defaultViewport : {width : 1000, height : 1080},
         headless : false,
-        // executablePath : 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
         slowMo : 50,
         devtools : true,
     });
