@@ -121,20 +121,10 @@ await page.evaluate(async (SELECTORS, tt_data) => {
             }
         }
     }, SELECTORS, tt_data);
-    // console.log(card_num_list);
-    // console.log(Array.from(card_num_list, card_num_list => card_num_list.textContent));
-    // let card_nums = await Promise.each(Array.from(card_num_list, card_num_list => card_num_list.textContent), (card_number) => {
-    //     const card_rarity = /(?<=#).*/g;
-    //     let card = card_rarity.exec(card_number.textContent);
-    //     return card;
-    // })
-    // console.log(card_nums);
-    await page.waitForSelector(SELECTORS.TCG.comments_btn).catch((err) => {
-        console.error(err);
-    });
+
+    await page.waitForSelector(SELECTORS.TCG.comments_btn)
     
     let data = await page.evaluate((SELECTORS) => {
-        console.log('asdfasdf');
         let amount = document.querySelector(SELECTORS.TCG.amount)
             .textContent
             .trim();
