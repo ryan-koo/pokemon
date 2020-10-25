@@ -36,9 +36,8 @@ open_browser();
 
 async function open_browser() {
     const browser = await puppeteer.launch({
-        defaultViewport : {width : 1000, height : 1000},
+        defaultViewport : {width : 1000, height : 1080},
         headless : false,
-        executablePath : 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
         slowMo : 50,
         devtools : true,
     });
@@ -67,8 +66,8 @@ async function trollandtoad(page) {
     await page.waitForSelector('.font-weight-bold.font-large.font-md-largest.mt-1');
 
     let data = await page.evaluate(async(SELECTORS) => {
-        const card_name = /^.*?(?=-)/g;
-        const card_rarity = /(?<=\-)(.*?)(?=\-)/g;
+        const card_name = /^.*?(?=-)/;
+        const card_rarity = /(?<=\-)(.*?)(?=\-)/;
         let amount = document.querySelector(SELECTORS.TT.amount)
             .textContent
             .trim();
@@ -109,34 +108,33 @@ async function tcg_player(page, tt_data) {
     await page.type(SELECTORS.TCG.search_bar, tt_data.Pokemon + '\u000d');
     await page.waitForSelector(SELECTORS.TCG.pagination);
 
-    await page.evaluate(async (SELECTORS, tt_data) => {
-        const card_rarity = /(?<=#).*/g // Ask alex about card rarity numbers [A-Z]{1,2}\d{1,2}
+await page.evaluate(async (SELECTORS, tt_data) => {
+        const card_rarity = /(?<=#).*/;// Ask alex about card rarity numbers [A-Z]{1,2}\d{1,2}
         let card_numbers = document.querySelectorAll(SELECTORS.TCG.card_nums);
-        
-        for(let i = 0; i < 2; i++) {
+        for(let i = 0; i < card_numbers.length; i++) {
             card_num = card_rarity.exec(card_numbers[i]
-                .textContent)
-            console.log(card_num)
+                .textContent);
             if(card_num == tt_data.Card_Number) {
-                console.log(card_num);
-                card_numbers[i].click()
+                return card_numbers[i].click()
             }
         }
     }, SELECTORS, tt_data);
-    
-    await page.waitForSelector(SELECTORS.TCG.comments_btn) // .catch(err); // ADD DELAY TO WAIT FOR PAGE TO LOAD
-    // throw Error
+
+    await page.waitForSelector(SELECTORS.TCG.comments_btn)
     
     let data = await page.evaluate((SELECTORS) => {
         let amount = document.querySelector(SELECTORS.TCG.amount)
             .textContent
             .trim();
+        console.log(amount)
         let pokemon_card = document.querySelector(SELECTORS.TCG.pokemon_card)
             .textContent
             .trim();
+        console.log(pokemon_card)
         let card_set = document.querySelector(SELECTORS.TCG.card_set)
             .textContent
             .trim();
+        console.log(card_set)
 
         return {
             Source : 'TCG Player',
