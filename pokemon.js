@@ -28,7 +28,8 @@ const SELECTORS = {
         amount : '.seller-spotlight__price',
         pokemon_card : '.product-details__name',
         card_set : '.product-details__set',
-        comments_btn : '.btn.btn-block.btn-primary',
+        add_to_cart : '#btnAddToCart_FeaturedSeller',
+        card_num : '.product-description__value',
     }
 }
 
@@ -90,7 +91,7 @@ async function trollandtoad(page) {
         data = {
             Source : 'Troll and Toad',
             Amount : amount,
-            Pokemon : pokemon_card,
+            Card_Name : pokemon_card,
             Card_Number : card_num,
             Card_Set : card_set,
         };
@@ -105,7 +106,7 @@ async function tcg_player(page, tt_data) {
     await page.goto(URLS.tcg);
     await page.waitForSelector(SELECTORS.TCG.search_bar);
 
-    await page.type(SELECTORS.TCG.search_bar, tt_data.Pokemon + '\u000d');
+    await page.type(SELECTORS.TCG.search_bar, tt_data.Card_Name + '\u000d');
     await page.waitForSelector(SELECTORS.TCG.pagination);
 
 await page.evaluate(async (SELECTORS, tt_data) => {
@@ -120,9 +121,10 @@ await page.evaluate(async (SELECTORS, tt_data) => {
         }
     }, SELECTORS, tt_data);
 
-    await page.waitForSelector(SELECTORS.TCG.comments_btn)
+    await page.waitForSelector(SELECTORS.TCG.add_to_cart)
     
     let data = await page.evaluate((SELECTORS) => {
+        const card_number = /[A-Z]*[0-9]*\/[A-Z]*[0-9]*/;
         let amount = document.querySelector(SELECTORS.TCG.amount)
             .textContent
             .trim();
@@ -135,11 +137,15 @@ await page.evaluate(async (SELECTORS, tt_data) => {
             .textContent
             .trim();
         console.log(card_set)
+        let card_num = card_number.exec(document.querySelector(SELECTORS.TCG.card_num)
+            .textContent
+            .trim())[0];
+        console.log(card_num)
 
         return {
             Source : 'TCG Player',
             Amount : amount,
-            Pokemon : pokemon_card,
+            Card_Name : pokemon_card,
             Card_Number : card_num,
             Card_Set : card_set,
         }
