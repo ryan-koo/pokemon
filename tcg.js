@@ -1,3 +1,13 @@
+'use strict';
+
+const puppeteer = require('puppeteer');
+
+class TCG {
+    constructor(page) {
+        this.page = page;
+    
+    
+
 async function tcg_player(page, tt_data) {
     await page.goto(URLS.tcg);
     await page.waitForSelector(SELECTORS.TCG.search_bar);

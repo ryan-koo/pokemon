@@ -12,14 +12,14 @@ const URLS = {
 
 const SELECTORS = {
     TT : {
-        prod_group_menu : '.btn.btn-sm.d-none.d-md-block',
-        pokemon_grouping : '.dropdown-item.border-bottom[data-catid="7061"]',
-        search_bar : '#search-words',
-        card : '.card-text',
-        amount : '.d-flex.font-weight-bold.font-default.text-center.align-items-end',
-        sale_amount : '#prodContainer > div.row.mt-2 > div.col-12.col-lg-4.col-xl-3.right > div.row.d-none.d-lg-block > div > div > div.card-header.d-flex.align-center.flex-around.p-2 > div.d-flex.font-weight-bold.font-default.text-center.align-items-end > div > span',
-        pokemon_card : '.font-weight-bold.font-large.font-md-largest.mt-1',
-        card_set : '.font-small.font-md-default',
+            prod_group_menu : '.btn.btn-sm.d-none.d-md-block',
+            pokemon_grouping : '.dropdown-item.border-bottom[data-catid="7061"]',
+            search_bar : '#search-words',
+            card : '.card-text',
+            amount : '.d-flex.font-weight-bold.font-default.text-center.align-items-end',
+            sale_amount : '#prodContainer > div.row.mt-2 > div.col-12.col-lg-4.col-xl-3.right > div.row.d-none.d-lg-block > div > div > div.card-header.d-flex.align-center.flex-around.p-2 > div.d-flex.font-weight-bold.font-default.text-center.align-items-end > div > span',
+            pokemon_card : '.font-weight-bold.font-large.font-md-largest.mt-1',
+            card_set : '.font-small.font-md-default',
     },
     TCG : {
         search_bar : '.input',
@@ -33,6 +33,12 @@ const SELECTORS = {
     }
 }
 
+class Sources {
+    constructor(browser, page){
+        this.browser = browser;
+        this.page = page;
+    }
+}
 open_browser();
 
 async function open_browser() {
@@ -153,4 +159,4 @@ await page.evaluate(async (SELECTORS, tt_data) => {
     }, SELECTORS);
 
     return data;
-}   
+}
